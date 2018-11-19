@@ -33,4 +33,10 @@ contact* DeleteContact(contact*);
 contact* DeleteContactByIndex(contact*, int);
 void SaveListToFile(contact*);
 contact* LoadListFromFile();
+void ClearBuffer();
+contact* SortContacts(contact*);
+void FindContact(contact*);
+void FindBy(contact*, int);
+//void FindByName(contact*);
+//void FindByNumber(contact*);
 

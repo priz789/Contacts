@@ -16,6 +16,12 @@ void DrawMainMenu()
 	cout << endl;
 }
 
+void ClearBuffer()
+{
+	cin.clear();
+	cin.ignore(cin.rdbuf()->in_avail());
+}
+
 contact * ListMemoryAdjust(int number)
 {
 	contact* list = new contact[number];
@@ -35,19 +41,15 @@ contact * ContactAddNew(contact* list)
 {
 	contact newOne;
 	cout << "Введите имя нового котакта: ";
-	cin.clear();
-	cin.ignore(cin.rdbuf()->in_avail());
+	ClearBuffer();
 	cin.getline(newOne.name, 20);
-	cin.clear();
-	cin.ignore(cin.rdbuf()->in_avail());
+	ClearBuffer();
 	cout << "Введите фамилию нового котакта: ";
 	cin.getline(newOne.surname, 20);
-	cin.clear();
-	cin.ignore(cin.rdbuf()->in_avail());
+	ClearBuffer();
 	cout << "Введите номер телефона нового котакта, в формате 380ХХХХХХХХХ: ";
 	cin.getline(newOne.phone, 13);
-	cin.clear();
-	cin.ignore(cin.rdbuf()->in_avail());
+	ClearBuffer();
 	cout << "Введите возраст нового котакта: ";
 	cin >> newOne.age;
 	cout << endl;
@@ -112,7 +114,7 @@ void ShowAllContacts(contact* list)
 			PrintContact(list, i);
 			cout << endl;
 		}
-		ShowOneContact(list);
+		/*ShowOneContact(list);*/
 		return;
 	}
 	cout << endl;
@@ -181,8 +183,7 @@ void PrintContact(contact* list, int index)
 	{
 		cout << endl;
 		cout << "\tПорядковый номер контакта: " << index+1 << endl;
-		cin.clear();
-		cin.ignore(cin.rdbuf()->in_avail());
+		ClearBuffer();
 		cout << "\tИмя: " << list[index].name << endl;
 		cout << "\tФамилия: " << list[index].surname << endl;
 		cout << "\tВозраст: " << list[index].age << endl;
@@ -201,7 +202,7 @@ void SaveListToFile(contact*list)
 		cout << "Введите имя файла для сохранения: ";
 		char filename[MAX_PATH];
 		gets_s(filename, MAX_PATH);
-		FILE * savedlist = fopen(filename, "ab");
+		FILE * savedlist = fopen(filename, "wb");
 		if (savedlist)
 		{
 			fseek(savedlist, 0, SEEK_END);
@@ -226,16 +227,194 @@ contact* LoadListFromFile()
 	char filename[MAX_PATH];
 	gets_s(filename, MAX_PATH);
 	FILE * loadlist = fopen(filename, "rb");
-	/*if (!loadlist);
+	if (loadlist)
 	{
-		perror("Open: ");
+		fseek(loadlist, 0, SEEK_SET);
+		int length = _filelength(_fileno(loadlist));
+		int size = length / sizeof(contact);
+		contact * newList = new contact[size];
+		fread(newList, sizeof(contact), size, loadlist);
+		fclose(loadlist);
+		cout << "Файл загружен." << endl;
+		system("pause");
+		return newList;
+	}
+	else
+	{
+		perror("Ошибка: ");
+		system("pause");
 		return nullptr;
-	}*/
-	fseek(loadlist, 0, SEEK_SET);
-	int length = _filelength(_fileno(loadlist));
-	int size = length / sizeof(contact);
-	contact * newList = new contact[size];
-	fread(newList, sizeof(contact), size, loadlist);
-	fclose(loadlist);
-	return newList;
+	}
+}
+
+contact* SortContacts(contact*list)
+{
+	if (list != nullptr)
+	{
+		cout << "Список контактов до сортировки." << endl;
+		ShowAllContacts(list);
+		int size = _msize(list) / sizeof(list[0]);
+		contact temp;
+		for (int i = 0; i < size - 1; i++)
+		{
+			for (int j = i + 1; j < size; j++)
+			{
+				if (strcmp(list[i].name,list[j].name)>0)
+				{
+					temp = list[i];
+					list[i] = list[j];
+					list[j] = temp;
+				}
+			}
+		}
+		cout << "Список котактов после сортировки: " << endl;
+		ShowAllContacts(list);
+		system("pause");
+		return list;
+	}
+	return nullptr;
+}
+
+void FindContact(contact*list)
+{
+	if (list != nullptr)
+	{
+		cout << endl;
+		int choice;
+		cout << "Выберите тип поиска:" << endl;
+		cout << endl;
+		cout << "\t1.По имени." << endl;
+		cout << "\t2.По номеру." << endl;
+		cout << endl;
+		cout << "Ваш выбор: ";
+		cin >> choice;
+		if (choice == 1 || choice == 2)
+		{
+			FindBy(list, choice);
+		}
+		else
+		{
+			cout << "Неверный выбор!" << endl;
+		}
+		/*	switch (choice)
+		{
+			case 1:
+				FindByName(list);
+				break;
+			case 2:
+				FindByNumber(list);
+				break;
+			default:
+				cout << "Неверный выбор!" << endl;
+				break;
+		}*/
+	}
+	else
+	{
+		cout << endl;
+		cout << "Cписок контактов пуст!" << endl;
+		cout << endl;
+	}
+	cout << endl;
+	system("pause");
+}
+
+//void FindByName(contact*list)
+//{
+//	if (list != nullptr)
+//	{
+//		cout << "Введите имя(или его часть) контакта для поиска: ";
+//		char *findname = new char[20];
+//		char *p;
+//		int a = 0;
+//		ClearBuffer();
+//		cin.getline(findname, 20);
+//		int size = _msize(list) / sizeof(list[0]);
+//		for (int i = 0; i < size; i++)
+//		{
+//			p = strstr(list[i].name,findname);
+//			if (p)
+//			{
+//				PrintContact(list, i);
+//			}
+//			else
+//			{
+//				a++;
+//			}
+//		}
+//		if (a == size)
+//		{
+//			cout << "Контакты с таким именем не обнаружены." << endl;
+//		}
+//	}
+//	return;
+//}
+//
+//void FindByNumber(contact*list)
+//{
+//	if (list != nullptr)
+//	{
+//		cout << "Введите номер(или его часть) для поиска: ";
+//		char *findname = new char[20];
+//		char *p;
+//		int a = 0;
+//		ClearBuffer();
+//		cin.getline(findname, 20);
+//		int size = _msize(list) / sizeof(list[0]);
+//		for (int i = 0; i < size; i++)
+//		{
+//			p = strstr(list[i].phone, findname);
+//			if (p)
+//			{
+//				PrintContact(list, i);
+//			}
+//			else
+//			{
+//				a++;
+//			}
+//		}
+//		if (a == size)
+//		{
+//			cout << "Контакты с таким номером не обнаружены." << endl;
+//		}
+//	}
+//	return;
+//}
+
+void FindBy(contact*list,int type)
+{
+	if (list != nullptr)
+	{
+		if (type == 1)
+		{
+			cout << "Введите имя(или его часть) контакта для поиска: ";
+		}
+		else
+		{
+			cout << "Введите номер(или его часть) для поиска: ";
+		}
+		char *findname = new char[20];
+		char *p;
+		int a = 0;
+		ClearBuffer();
+		cin.getline(findname, 20);
+		int size = _msize(list) / sizeof(list[0]);
+		for (int i = 0; i < size; i++)
+		{
+			p = strstr(type == 1? list[i].name : list[i].phone, findname);
+			if (p)
+			{
+				PrintContact(list, i);
+			}
+			else
+			{
+				a++;
+			}
+		}
+		if (a == size)
+		{
+			cout << "Контакты с таким именем не обнаружены." << endl;
+		}
+	}
+	return;
 }

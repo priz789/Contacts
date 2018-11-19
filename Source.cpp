@@ -16,7 +16,7 @@
 
 void main()
 {
-	setlocale(LC_ALL, "Russian");
+	setlocale(LC_ALL, "Russian"); // Подключение русских символов для отображения
 	cout << "\tВас приветствует программа \"Контакты\"." << endl << endl;
 	system("pause");
 	MainMenu();

@@ -7,8 +7,7 @@ void MainMenu()
 	while (true)
 	{
 		system("cls");
-		cin.clear();
-		cin.ignore(cin.rdbuf()->in_avail());
+		ClearBuffer();
 		DrawMainMenu();
 		choice = _getch();
 		switch (choice)
@@ -38,10 +37,12 @@ void MainMenu()
 			ShowAllContacts(listOfContacts);
 			break;
 		case '7':
-			cout << "Сортировка контактов по алфавиту." << endl;
+			cout << "Сортировка контактов по алфавиту(по имени)." << endl;
+			listOfContacts = SortContacts(listOfContacts);
 			break;
 		case '8':
 			cout << "Поиск контакта." << endl;
+			FindContact(listOfContacts);
 			break;
 		case '9':
 			cout << "Выход." << endl;
